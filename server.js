@@ -4,6 +4,7 @@ require('dotenv').config()
 const router = require('./router')
 const socket = require('socket.io')
 const path = require('path')
+const nodemailer = require('nodemailer')
 
 // Database connection
 require('./config/dbConnection')
@@ -14,6 +15,21 @@ app.use(express.json())
 app.use(cors())
 
 app.use('/api', router)
+
+var transport = nodemailer.createTransport({
+    port: 465,
+    host: 'smtp.gmail.com',
+    auth: { pass: process.env.MAIL_PASS,
+    user: process.env.MAIL_USER}
+})
+
+var mailOptions = {     
+    from: 'Test Nube CAAR <nocontestar@reply.com>',
+    to: 'biaus.fh@gmail.com',
+    subject: 'Conexión establecida en TEST NUBECAAR',
+    text: "",
+    html: "" 
+}
 
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static('client/build'))
@@ -28,7 +44,7 @@ const server = app.listen(port, host, () => console.log(`Server listening on por
 
 const io = socket(server)
 io.on('connection', socket => {
-    console.log(`Conexión de ${socket.id} el ${new Date().toLocaleString()}`)
+    transport.sendMail(mailOptions, () => console.log(`Conexión de ${socket.id} el ${new Date().toLocaleString()}`))
     socket.on('reloadPlease', () => {
         socket.broadcast.emit("reloadOrder")
     })
