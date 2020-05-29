@@ -15,7 +15,7 @@ app.use(cors())
 
 app.use('/api', router)
 
-if (process.env.NODE_END === 'production') {
+if (process.env.NODE_ENV === 'production') {
     app.use(express.static('client/build'))
     app.get('*', (req, res) => {
         res.sendFile(pathjoin(__dirname+"/client/build/index.html"))
